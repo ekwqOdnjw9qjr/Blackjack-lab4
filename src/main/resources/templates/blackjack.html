@@ -11,7 +11,6 @@
 
     <div th:if="${error}" class="error" th:text="${error}"></div>
 
-
     <h3>Фишки игрока: <span th:text="${playerChips}"></span></h3>
     <h3>Текущая ставка: <span th:text="${currentBet}"></span></h3>
     <h3>Стратегия игры дилера: <span th:text="${currentStrategy}"></span></h3>
@@ -24,7 +23,7 @@
             <select name="strategy">
                 <option value="conservative">Консервативная</option>
                 <option value="aggressive">Агрессивная</option>
-                <option value="smart">Умная</option>
+                <option value="smart">Адаптирующаяся</option>
             </select>
             <button type="submit">Установить стратегию</button>
         </form>
@@ -39,23 +38,23 @@
     </div>
 
     <div class="cards">
-        <h3>Карты дилера (<span th:text="${dealerScore}"></span>)</h3>
+        <h3>Карты дилера</h3>
         <div class="card" th:each="card, iter : ${dealerCards}" th:classappend="${card.suit != null ? card.suit.toString().toLowerCase() : 'hidden'}">
             <div th:if="${card.suit != null}">
-                <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
-                <div class="center" th:text="${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
-                <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+                <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suitSymbol}"></div>
+                <div class="center" th:text="${card.suitSymbol}"></div>
+                <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suitSymbol}"></div>
             </div>
             <div th:if="${card.suit == null}" class="hidden-card">?</div>
         </div>
     </div>
 
     <div class="cards" th:each="hand, iter : ${playerHands}">
-        <h3>Рука игрока <span th:text="${iter.index + 1}"></span> (<span th:text="${hand.calculateScore()}"></span>)</h3>
+        <h3>Рука игрока</h3>
         <div class="card" th:each="card : ${hand.cards}" th:classappend="${card.suit.toString().toLowerCase()}">
-            <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
-            <div class="center" th:text="${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
-            <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+            <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suitSymbol}"></div>
+            <div class="center" th:text="${card.suitSymbol}"></div>
+            <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suitSymbol}"></div>
         </div>
     </div>
 
@@ -80,7 +79,7 @@
             <button type="submit">Сдаться</button>
         </form>
     </div>
-    <!-- Модальное окно с правилами -->
+
     <div id="rulesModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="document.getElementById('rulesModal').style.display='none'">×</span>

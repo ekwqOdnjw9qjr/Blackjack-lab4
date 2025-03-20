@@ -11,11 +11,6 @@ public class Card {
     private final Suit suit;
     private final Rank rank;
 
-
-    public int getValue() {
-        return rank.getValue();
-    }
-
     public String getDisplayRank() {
         switch (rank) {
             case ACE: return "A";
@@ -25,6 +20,19 @@ public class Card {
             case TEN: return "10";
             default: return String.valueOf(rank.getValue());
         }
+    }
+
+    public int getValue() {
+        return rank.getValue();
+    }
+
+    public String getSuitSymbol() {
+        return switch (suit) {
+            case HEARTS -> "♥";
+            case DIAMONDS -> "♦";
+            case CLUBS -> "♣";
+            case SPADES -> "♠";
+        };
     }
 
     @Override

@@ -8,15 +8,16 @@ import com.qwerty.blackjackgame.strategy.SmartStrategy;
 import com.qwerty.blackjackgame.strategy.ConservativeStrategy;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Slf4j
 @Getter
-@NoArgsConstructor
+@Component
 public class BlackjackGame {
     private Deck deck = new Deck();
     private Hand playerHand = new Hand();
@@ -29,9 +30,15 @@ public class BlackjackGame {
     private int insuranceBet = 0;
     private boolean surrendered = false;
 
+    public BlackjackGame() {
+        this.dealerStrategy = new SmartStrategy();
+    }
+
+
+
     public void startNewGame(int bet) {
         if (bet > playerChips || bet <= 0) {
-            throw new IllegalArgumentException("Invalid bet amount");
+            throw new IllegalArgumentException("Неверная сумма ставки");
         }
 
         playerBet = bet;
@@ -50,7 +57,7 @@ public class BlackjackGame {
 
     public void playerDoubleDown() {
         if (playerBet * 2 > playerChips) {
-            throw new IllegalArgumentException("Not enough chips to double down");
+            throw new IllegalArgumentException("Не хватает фишек для удвоения");
         }
         playerBet *= 2;
         playerHit();
@@ -59,20 +66,14 @@ public class BlackjackGame {
 
     public String playerSurrender() {
         if (playerBet == 0) {
-            throw new IllegalStateException("No active bet to surrender");
+            throw new IllegalStateException("Нет активной ставки чтобы сдаться");
         }
         surrendered = true;
         playerChips -= playerBet;
         playerChips += playerBet / 2;
-        String result = "Player surrendered. Half of the bet (" + (playerBet / 2) + ") returned.";
+        String result = "Игрок сдался. Половина ставки (" + (playerBet / 2) + ") возвращена.";
         playerBet = 0;
         return result;
-    }
-
-    public void dealerPlay() {
-        while (dealerHand.calculateScore() < 17) {
-            dealerHand.addCard(deck.draw());
-        }
     }
 
     public String determineWinner() {
@@ -81,24 +82,31 @@ public class BlackjackGame {
         }
         int playerScore = playerHand.calculateScore();
         int dealerScore = dealerHand.calculateScore();
+        log.info("Определение победителя: Очки игрока = " + playerScore + ", Очки дилера = " + dealerScore);
+
+        if (playerScore > 21 && dealerScore > 21) {
+            return "Push! Оба перебрали. Изменений в фишках нет.";
+        }
 
         if (playerScore > 21) {
             playerChips -= playerBet;
-            return "Dealer wins! Player busts. Bet " + playerBet + " lost.";
+            return "Dealer wins! У игрока перебор. Ставка " + playerBet + " проигрыш.";
         }
+
         if (dealerScore > 21) {
             playerChips += playerBet;
-            return "Player wins! Dealer busts. Bet " + playerBet + " won.";
+            return "Player wins! У дилера перебор. Ставка " + playerBet + " победа.";
         }
+
         if (playerScore > dealerScore) {
             playerChips += playerBet;
-            return "Player wins! Bet " + playerBet + " won.";
+            return "Player wins! Ставка " + playerBet + " победа.";
         }
         if (dealerScore > playerScore) {
             playerChips -= playerBet;
-            return "Dealer wins! Bet " + playerBet + " lost.";
+            return "Dealer wins! Ставка " + playerBet + " проигрыш.";
         }
-        return "Push! No change in chips.";
+        return "Push! Фишки не изменились.";
     }
 
     public boolean isGameOver() {
@@ -127,10 +135,24 @@ public class BlackjackGame {
         }
     }
 
+    public void dealerPlay() {
+        log.info("Дилер начинает играть по стратегии " + getCurrentStrategy());
+        while (true) {
+            int dealerScore = dealerHand.calculateScore();
+            log.info("Очки дилера: " + dealerScore + ", проверка, стоит ли брать карту...");
+            if (!dealerStrategy.shouldHit(dealerHand, playerHand.getCards().get(0))) {
+                break;
+            }
+            log.info("Очки дилера: " + dealerScore + ", взятие карты...");
+            dealerHand.addCard(deck.draw());
+        }
+        log.info("Дилер завершил игру. Итоговый счет: " + dealerHand.calculateScore());
+    }
+
     public String getCurrentStrategy() {
-        if (dealerStrategy instanceof ConservativeStrategy) return "Conservative";
-        if (dealerStrategy instanceof AggressiveStrategy) return "Aggressive";
-        if (dealerStrategy instanceof SmartStrategy) return "Smart";
+        if (dealerStrategy instanceof ConservativeStrategy) return "Консервативная";
+        if (dealerStrategy instanceof AggressiveStrategy) return "Агрессивная";
+        if (dealerStrategy instanceof SmartStrategy) return "Адаптирующаяся";
         return "Smart";
     }
 

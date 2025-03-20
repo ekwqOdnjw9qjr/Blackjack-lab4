@@ -6,4 +6,6 @@ import com.qwerty.blackjackgame.model.Hand;
 
 public interface DealerStrategy {
     boolean shouldHit(Hand hand, Card playerVisibleCard);
+
+    void reset();
 }

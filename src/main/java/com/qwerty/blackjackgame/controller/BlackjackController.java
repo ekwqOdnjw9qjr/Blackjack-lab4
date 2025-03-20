@@ -4,11 +4,16 @@ package com.qwerty.blackjackgame.controller;
 
 
 import com.qwerty.blackjackgame.game.BlackjackGame;
+import com.qwerty.blackjackgame.model.Card;
+import com.qwerty.blackjackgame.model.Hand;
 import com.qwerty.blackjackgame.service.BlackjackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/blackjack")
@@ -133,10 +138,13 @@ public class BlackjackController {
     }
 
     private void updateModel(Model model, boolean gameOver) {
-        model.addAttribute("playerHands", blackjackGame.getPlayerHand());
-        model.addAttribute("dealerCards", service.getDealerCards(gameOver));
+        List<Hand> playerHands = blackjackGame.getPlayerHand() != null ? List.of(blackjackGame.getPlayerHand()) : new ArrayList<>();
+        model.addAttribute("playerHands", playerHands);
+        List<Card> dealerCards = service.getDealerCards(gameOver);
+        model.addAttribute("dealerCards", dealerCards);
         model.addAttribute("playerScore", service.getPlayerScore());
-        model.addAttribute("dealerScore", gameOver ? service.getDealerScore() : service.getDealerCards(true).get(0).getValue());
+        int dealerScore = gameOver ? service.getDealerScore() : (dealerCards.isEmpty() ? 0 : dealerCards.get(0).getValue());
+        model.addAttribute("dealerScore", dealerScore);
         model.addAttribute("playerChips", blackjackGame.getPlayerChips());
         model.addAttribute("currentBet", blackjackGame.getPlayerBet());
         model.addAttribute("gameOver", gameOver);

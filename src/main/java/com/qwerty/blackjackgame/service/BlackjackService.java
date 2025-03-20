@@ -25,7 +25,8 @@ public class BlackjackService {
     }
 
     public int getDealerScore() {
-        return game.getDealerHand().calculateScore();
+        int score = game.getDealerHand() != null ? game.getDealerHand().calculateScore() : 0;
+        return score;
     }
 
     public List<Card> getDealerCards(boolean gameOver) {

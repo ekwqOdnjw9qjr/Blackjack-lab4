@@ -19,14 +19,16 @@ public class Hand {
         int aces = 0;
 
         for (Card card : cards) {
+            int value = card.getValue();
+            score += value;
+
             if (card.getRank() == Rank.ACE) {
                 aces++;
             }
-            score += card.getValue();
         }
 
-        while (score > 21 && aces > 0) {
-            score -= 10;
+        while (score <= 21 && aces > 0) {
+            score += 10;
             aces--;
         }
 
