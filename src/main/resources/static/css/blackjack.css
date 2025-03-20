@@ -1,0 +1,193 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #123456, #0d1f1b);
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 800px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+h3 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.cards {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: #fff;
+    width: 100px;
+    height: 150px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+.card.hearts, .card.diamonds {
+    color: #ff0000;
+}
+
+.card.clubs, .card.spades {
+    color: #000000;
+}
+
+.card.hidden {
+    background: linear-gradient(135deg, #333, #666);
+    color: #fff;
+}
+
+.card .top-left, .card .bottom-right {
+    font-size: 16px;
+}
+
+.card .center {
+    font-size: 36px;
+}
+
+.card .hidden-card {
+    font-size: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: linear-gradient(135deg, #333, #666);
+    color: #fff;
+}
+
+.card .visible-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.error {
+    color: #ff4444;
+    font-size: 20px;
+    margin: 10px 0;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.bet-form, .strategy-form, .insurance-form {
+    margin: 20px 0;
+}
+
+.bet-form label, .strategy-form label, .insurance-form label {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.bet-form input, .insurance-form input {
+    padding: 8px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    color: #000;
+}
+
+.strategy-form select {
+    padding: 8px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    color: #000;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 18px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    background: #ffd700;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:hover {
+    background: #ffeb3b;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.result {
+    font-size: 28px;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 1);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #fff;
+    text-align: left;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffd700;
+}
+
+.close:hover {
+    color: #ffeb3b;
+}

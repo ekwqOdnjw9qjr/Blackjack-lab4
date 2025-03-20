@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blackjack</title>
+    <link rel="stylesheet" href="/css/blackjack.css">
+</head>
+<body>
+<div class="container">
+    <h1>Blackjack</h1>
+
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+
+
+    <h3>Фишки игрока: <span th:text="${playerChips}"></span></h3>
+    <h3>Текущая ставка: <span th:text="${currentBet}"></span></h3>
+    <h3>Стратегия игры дилера: <span th:text="${currentStrategy}"></span></h3>
+
+    <button onclick="document.getElementById('rulesModal').style.display='flex'">Показать правила</button>
+
+    <div class="strategy-form">
+        <form method="post" action="/blackjack/set-strategy">
+            <label>Выберите стратегию:</label>
+            <select name="strategy">
+                <option value="conservative">Консервативная</option>
+                <option value="aggressive">Агрессивная</option>
+                <option value="smart">Умная</option>
+            </select>
+            <button type="submit">Установить стратегию</button>
+        </form>
+    </div>
+
+    <div th:if="${gameOver == false and (playerHands == null or #lists.isEmpty(playerHands))}" class="bet-form">
+        <form method="post" action="/blackjack/start">
+            <label>Сумма ставки:</label>
+            <input type="number" name="bet" min="1" th:max="${playerChips}" required>
+            <button type="submit">Начать игру</button>
+        </form>
+    </div>
+
+    <div class="cards">
+        <h3>Карты дилера (<span th:text="${dealerScore}"></span>)</h3>
+        <div class="card" th:each="card, iter : ${dealerCards}" th:classappend="${card.suit != null ? card.suit.toString().toLowerCase() : 'hidden'}">
+            <div th:if="${card.suit != null}">
+                <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+                <div class="center" th:text="${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+                <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+            </div>
+            <div th:if="${card.suit == null}" class="hidden-card">?</div>
+        </div>
+    </div>
+
+    <div class="cards" th:each="hand, iter : ${playerHands}">
+        <h3>Рука игрока <span th:text="${iter.index + 1}"></span> (<span th:text="${hand.calculateScore()}"></span>)</h3>
+        <div class="card" th:each="card : ${hand.cards}" th:classappend="${card.suit.toString().toLowerCase()}">
+            <div class="top-left" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+            <div class="center" th:text="${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+            <div class="bottom-right" th:text="${card.displayRank} + ' ' + ${card.suit == 'HEARTS' ? '♥' : card.suit == 'DIAMONDS' ? '♦' : card.suit == 'CLUBS' ? '♣' : '♠'}"></div>
+        </div>
+    </div>
+
+    <div th:if="${result}" class="result">
+        <p th:text="${result}"></p>
+        <form method="post" action="/blackjack/new-game">
+            <button type="submit">Новая игра</button>
+        </form>
+    </div>
+
+    <div th:if="${playerHands != null and !#lists.isEmpty(playerHands) and gameOver == false}">
+        <form method="post" action="/blackjack/hit" style="display: inline;">
+            <button type="submit">Взять карту</button>
+        </form>
+        <form method="post" action="/blackjack/stand" style="display: inline;">
+            <button type="submit">Остановиться</button>
+        </form>
+        <form method="post" action="/blackjack/double" style="display: inline;">
+            <button type="submit" th:disabled="${playerChips lt currentBet}">Удвоить</button>
+        </form>
+        <form method="post" action="/blackjack/surrender" style="display: inline;">
+            <button type="submit">Сдаться</button>
+        </form>
+    </div>
+    <!-- Модальное окно с правилами -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('rulesModal').style.display='none'">×</span>
+            <h2>Правила игры в блэкджек</h2>
+            <p><strong>Цель игры:</strong> Игрок и дилер соревнуются, чтобы набрать сумму очков в руке как можно ближе к 21, но не превышая её.</p>
+            <p><strong>Игровой процесс:</strong></p>
+            <ul>
+                <li>Игроку и дилеру раздаётся по две карты.</li>
+                <li>Карты игрока сдаются лицом вверх.</li>
+                <li>У дилера первая карта открыта, вторая — закрыта.</li>
+            </ul>
+            <p><strong>Стоимость карт:</strong></p>
+            <ul>
+                <li>Туз (A): 11.</li>
+                <li>Король, Дама, Валет (K, Q, J): 10 очков.</li>
+                <li>Остальные карты: номинал карты.</li>
+            </ul>
+            <p><strong>Действия игрока:</strong></p>
+            <ul>
+                <li><strong>Взять карту:</strong> Взять ещё одну карту из колоды.</li>
+                <li><strong>Остановиться:</strong> Завершить ход с текущими картами.</li>
+                <li><strong>Удвоить:</strong> Удвоить ставку, взять одну карту и остановиться.</li>
+                <li><strong>Разделить:</strong> Если у игрока две одинаковые карты, можно разделить их на две руки (требуется дополнительная ставка).</li>
+                <li><strong>Сдаться:</strong> Сдаться и вернуть половину ставки (если разрешено).</li>
+                <li><strong>Страховка:</strong> Сделать ставку на то, что у дилера блэкджек, если открытая карта дилера — туз (выплата 2:1).</li>
+            </ul>
+            <p><strong>Действия дилера:</strong></p>
+            <ul>
+                <li>Дилер открывает закрытую карту, если игрок не превысил 21.</li>
+                <li>Дилер должен брать карты, пока не наберёт 17 или больше, затем останавливается.</li>
+            </ul>
+            <p><strong>Победа:</strong></p>
+            <ul>
+                <li>Если игрок превышает 21 (перебор), дилер выигрывает.</li>
+                <li>Если дилер превышает 21, а игрок нет, игрок выигрывает.</li>
+                <li>Выигрывает тот, у кого больше очков; при равенстве — ничья (ставка возвращается).</li>
+            </ul>
+            <p><strong>Выплаты:</strong></p>
+            <ul>
+                <li>Обычный выигрыш: 1:1.</li>
+                <li>Блэкджек (21 с первыми двумя картами): 3:2.</li>
+                <li>Страховка (если у дилера блэкджек): 2:1.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
