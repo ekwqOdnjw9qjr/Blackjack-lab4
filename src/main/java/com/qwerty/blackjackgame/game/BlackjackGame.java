@@ -40,7 +40,8 @@ public class BlackjackGame {
         if (bet > playerChips || bet <= 0) {
             throw new IllegalArgumentException("Неверная сумма ставки");
         }
-
+        
+        surrendered = false;
         playerBet = bet;
         playerHand.clear();
         dealerHand.clear();
